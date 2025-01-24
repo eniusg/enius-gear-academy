@@ -25,9 +25,12 @@ jobs:
       - name: Add rust-src component
         run: rustup component add rust-src --toolchain stable-x86_64-unknown-linux-gnu
 
+      - name: Clean cargo build cache
+        run: cargo clean
+
       - name: Check and test
         run: |
           cd pebbles-game
           cargo fmt --all --check
           cargo clippy --all-targets -- -D warnings -A unused-imports
-          cargo test 
+          cargo test
