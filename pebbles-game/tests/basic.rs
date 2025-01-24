@@ -8,6 +8,7 @@ fn initialization() {
     let sys = System::new();
     sys.init_logger();
 
+    // 为用户添加足够的 gas 费用
     sys.mint_to(USER_ID, 99999999999999999);
     let program = Program::current(&sys);
 
@@ -17,7 +18,7 @@ fn initialization() {
         max_pebbles_per_turn: 3,
         difficulty: DifficultyLevel::Easy,
     };
-    let res = program.send(USER_ID, init_config);
+    let _res = program.send(USER_ID, init_config);
     sys.run_next_block();
 
     // Test invalid initialization - zero pebbles
@@ -26,7 +27,7 @@ fn initialization() {
         max_pebbles_per_turn: 3,
         difficulty: DifficultyLevel::Easy,
     };
-    let res = program.send(USER_ID, invalid_init);
+    let _res = program.send(USER_ID, invalid_init);
     sys.run_next_block();
 }
 
@@ -48,11 +49,11 @@ fn game_actions() {
     sys.run_next_block();
 
     // Test valid move
-    let res = program.send(USER_ID, PebblesAction::Turn(2));
+    let _res = program.send(USER_ID, PebblesAction::Turn(2));
     sys.run_next_block();
 
     // Test invalid move - exceeds max pebbles per turn
-    let res = program.send(USER_ID, PebblesAction::Turn(4));
+    let _res = program.send(USER_ID, PebblesAction::Turn(4));
     sys.run_next_block();
 }
 
@@ -74,7 +75,7 @@ fn test_give_up() {
     sys.run_next_block();
 
     // Test surrender action
-    let res = program.send(USER_ID, PebblesAction::GiveUp);
+    let _res = program.send(USER_ID, PebblesAction::GiveUp);
     sys.run_next_block();
 
     let state: GameState = program.read_state(()).expect("Failed to read state");
@@ -98,13 +99,13 @@ fn test_restart() {
     program.send(USER_ID, init_config);
     sys.run_next_block();
 
-    // Test game restart
-    let restart_config = PebblesAction::Restart {
+    // Test game _restart
+    let _restart_config = PebblesAction::Restart {
         pebbles_count: 15,
         max_pebbles_per_turn: 2,
         difficulty: DifficultyLevel::Hard,
     };
-    let res = program.send(USER_ID, restart_config);
+    let _res = program.send(USER_ID, _restart_config);
     sys.run_next_block();
 
     let state: GameState = program.read_state(()).expect("Failed to read state");
