@@ -1,5 +1,5 @@
 #![no_std]
-use gmeta::{InOut, Metadata, Out, In};
+use gmeta::{In, InOut, Metadata, Out};
 use gstd::prelude::*;
 
 #[derive(Debug, Default, Clone, Encode, Decode, TypeInfo)]
