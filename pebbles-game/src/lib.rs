@@ -1,3 +1,4 @@
+#![allow(static_mut_refs)]
 #![no_std]
 use gstd::{exec, msg, prelude::*};
 use pebbles_game_io::*;
