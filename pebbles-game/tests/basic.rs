@@ -8,7 +8,6 @@ fn initialization() {
     let sys = System::new();
     sys.init_logger();
 
-    // 为用户添加足够的 gas 费用
     sys.mint_to(USER_ID, 99999999999999999);
     let program = Program::current(&sys);
 
