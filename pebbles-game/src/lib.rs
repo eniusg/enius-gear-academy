@@ -1,5 +1,5 @@
 #![no_std]
-use gstd::{msg, prelude::*, exec};
+use gstd::{exec, msg, prelude::*};
 use pebbles_game_io::*;
 
 static mut GAME_STATE: Option<GameState> = None;
@@ -27,12 +27,12 @@ fn get_state() -> &'static GameState {
 #[no_mangle]
 extern "C" fn init() {
     let init_config: PebblesInit = msg::load().expect("Failed to decode PebblesInit");
-    
+
     // Validate input parameters
     if init_config.pebbles_count == 0 || init_config.max_pebbles_per_turn == 0 {
         panic!("Invalid initialization parameters");
     }
-    
+
     // Randomly select the first player
     let first_player = if get_random_u32() % 2 == 0 {
         Player::User
@@ -65,13 +65,16 @@ extern "C" fn handle() {
     match action {
         PebblesAction::Turn(pebbles) => {
             // Validate player's move
-            if pebbles == 0 || pebbles > state.max_pebbles_per_turn || pebbles > state.pebbles_remaining {
+            if pebbles == 0
+                || pebbles > state.max_pebbles_per_turn
+                || pebbles > state.pebbles_remaining
+            {
                 panic!("Invalid turn");
             }
 
             // Execute player's turn
             state.pebbles_remaining -= pebbles;
-            
+
             if state.pebbles_remaining == 0 {
                 state.winner = Some(Player::User);
                 msg::reply(PebblesEvent::Won(Player::User), 0).expect("Failed to send event");
@@ -80,22 +83,30 @@ extern "C" fn handle() {
 
             // Execute program's turn
             make_program_turn();
-        },
+        }
         PebblesAction::GiveUp => {
             state.winner = Some(Player::Program);
             msg::reply(PebblesEvent::Won(Player::Program), 0).expect("Failed to send event");
-        },
-        PebblesAction::Restart { difficulty, pebbles_count, max_pebbles_per_turn } => {
+        }
+        PebblesAction::Restart {
+            difficulty,
+            pebbles_count,
+            max_pebbles_per_turn,
+        } => {
             // Reset game state
             *state = GameState {
                 pebbles_count,
                 max_pebbles_per_turn,
                 pebbles_remaining: pebbles_count,
                 difficulty,
-                first_player: if get_random_u32() % 2 == 0 { Player::User } else { Player::Program },
+                first_player: if get_random_u32() % 2 == 0 {
+                    Player::User
+                } else {
+                    Player::Program
+                },
                 winner: None,
             };
-            
+
             if state.first_player == Player::Program {
                 make_program_turn();
             }
@@ -109,7 +120,7 @@ fn make_program_turn() {
         DifficultyLevel::Easy => {
             // Randomly choose number of pebbles to remove
             (get_random_u32() % state.max_pebbles_per_turn.min(state.pebbles_remaining)) + 1
-        },
+        }
         DifficultyLevel::Hard => {
             // Use winning strategy
             calculate_winning_move(state.pebbles_remaining, state.max_pebbles_per_turn)
@@ -140,5 +151,3 @@ fn calculate_winning_move(remaining: u32, max_per_turn: u32) -> u32 {
 extern "C" fn state() {
     msg::reply(get_state().clone(), 0).expect("Failed to share state");
 }
-
-
